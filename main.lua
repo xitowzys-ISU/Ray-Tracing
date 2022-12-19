@@ -3,6 +3,7 @@ require("obstacle")
 require("ray")
 require('radiant')
 require('radiantUnique')
+require("vision")
 
 function love.load()
     width = love.graphics.getWidth()
@@ -26,34 +27,33 @@ function love.load()
     points = { { 80, 300 }, { 140, 300 }, { 140, 470 }, { 120, 470 }, { 80, 300 } }
     obstacles[5] = Obstacle:create(points)
 
-    --ray = Ray:create({ width / 2, height /2 }, { width, height })
-    radiant = RadiantUnique:create(50000)
+
     segments = {}
     for i = 1, #obstacles do
         points = obstacles[i].points
 
         for j = 2, #points do
-            table.insert(segments, { points[j - 1], points[j] })
+            table.insert(segments, { points[j - 1], points[j], i })
         end
 
     end
-    --print("Total segments: " .. tostring(#segments))
 
+    Vision = Vision:create(width / 2, height / 2, 30)
 end
 
 function love.update(dt)
-    --print(love.mouse.getPosition()[0])
-    --local x, y = love.mouse.getPosition()
-    --print("Total segments: " .. tostring(#segments))
-    --ray:lineTo({x, y}, segments)
-    --print(segments[1])
-    radiant:update(segments)
+    for i = 1, #obstacles do
+        obstacles[i]:update()
+    end
+
+    local x, y = love.mouse.getPosition()
+    Vision:update(x, y)
+
 end
 
 function love.draw()
     for i = 1, #obstacles do
         obstacles[i]:draw()
     end
-    --ray:draw()
-    radiant:draw()
+    Vision:draw()
 end

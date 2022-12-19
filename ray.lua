@@ -8,6 +8,8 @@ function Ray:create(origin, to)
     ray.to = origin
     ray.intersections = {}
     ray.closest = nil
+
+    ray.cs = {}
     return ray
 end
 
@@ -70,22 +72,25 @@ end
 
 function Ray:lineTo(to, segments)
     self.to = to
-    local intersections = {}
+    local intersects = {}
     self.closest = nil
-    print("Total segments: " .. tostring(segments))
     for i = 1, #segments do
-        local intersection = self:intersection(segments[i])
-        if (intersection ~= nil) then
-            table.insert(intersections, intersection)
+        local intersect = self:intersection(segments[i])
+        if (intersect ~= nil) then
+            table.insert(intersects, intersect)
             if (self.closest == nil) then
-                self.closest = intersection
+                self.closest = intersect
+                self.cs = segments[i][3]
             else
-                if (intersection.t1 < self.closest.t1) then
-                    self.closest = intersection
+                if (intersect.t1 < self.closest.t1) then
+                    self.closest = intersect
+                    self.cs      = segments[i][3]
                 end
             end
         end
     end
-
-    self.intersections = intersections
+    if (self.cs) then
+        obstacles[self.cs].visible = true
+    end
+    self.intersects = intersects
 end
